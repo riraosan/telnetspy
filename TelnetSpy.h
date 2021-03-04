@@ -3,15 +3,15 @@
  * Cloning the serial port via Telnet.
  *
  * Written by Wolfgang Mattis (arduino@yasheena.de).
- * Version 1.1 / September 7, 2018. 
- * MIT license, all text above must be included in any redistribution.   
+ * Version 1.1 / September 7, 2018.
+ * MIT license, all text above must be included in any redistribution.
  */
 
 /*
  * DESCRIPTION
  *
- * This module allows you "Debugging over the air". So if you already use 
- * ArduinoOTA this is a helpful extension for wireless development. Use 
+ * This module allows you "Debugging over the air". So if you already use
+ * ArduinoOTA this is a helpful extension for wireless development. Use
  * "TelnetSpy" instead of "Serial" to send data to the serial port and a copy
  * to a telnet connection. There is a circular buffer which allows to store the
  * data while the telnet connection is not established. So its possible to
@@ -42,19 +42,19 @@
  * connected it will be disconnected.
  * Default: 23
  *		void setPort(uint16_t portToUse);
- *		 
+ *
  * Change the message which will be send to the telnet client after a session
  * is established.
  * Default: "Connection established via TelnetSpy.\n"
- *		void setWelcomeMsg(char* msg);    
+ *		void setWelcomeMsg(char* msg);
  *
  * Change the message which will be send to the telnet client if another
  * session is already established.
  * Default: "TelnetSpy: Only one connection possible.\n"
- *		void setRejectMsg(char* msg);    
+ *		void setRejectMsg(char* msg);
  *
  * Change the amount of characters to collect before sending a telnet block.
- * Default: 64 
+ * Default: 64
  *		void setMinBlockSize(uint16_t minSize);
  *
  * Change the time (in ms) to wait before sending a telnet block if its size is
@@ -89,7 +89,7 @@
  * a long timeout. Use setPingTime to define the time (in ms) without traffic
  * after which a ping (chr(0)) is sent to the telnet client to detect a
  * disconnect earlier. Use 0 as parameter to disable pings.
- * Default: 1500  
+ * Default: 1500
  *		void setPingTime(uint16_t pngTime);
  *
  * Set the serial port you want to use with this object (especially for ESP32)
@@ -138,7 +138,7 @@
  * time. But its possible to use more than one instance of TelnetSpy.
  *
  * If you have problems with low memory you may reduce the value of the define
- * TELNETSPY_BUFFER_LEN for a smaller ring buffer on initialisation.    
+ * TELNETSPY_BUFFER_LEN for a smaller ring buffer on initialisation.
  *
  * Usage of void setDebugOutput(bool) to enable / disable of capturing of
  * os_print calls when you have more than one TelnetSpy instance: That
@@ -161,7 +161,6 @@
 #define TELNETSPY_WELCOME_MSG "Connection established via TelnetSpy.\r\n"
 #define TELNETSPY_REJECT_MSG "TelnetSpy: Only one connection possible.\r\n"
 
-
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
 // empty defines, so on ESP8266 nothing will be changed
@@ -178,92 +177,98 @@
 #endif
 #include <WiFiClient.h>
 
-class TelnetSpy : public Stream {
-	public:
-		TelnetSpy();
-		~TelnetSpy();
-		void handle(void);   
-		void setPort(uint16_t portToUse);
-		void setWelcomeMsg(char* msg);
-		void setRejectMsg(char* msg);
-		void setMinBlockSize(uint16_t minSize);
-		void setCollectingTime(uint16_t colTime);
-		void setMaxBlockSize(uint16_t maxSize);
-		bool setBufferSize(uint16_t newSize);
-		uint16_t getBufferSize();
-		void setStoreOffline(bool store);
-		bool getStoreOffline();
-		void setPingTime(uint16_t pngTime);
-		void setSerial(HardwareSerial* usedSerial);
-		bool isClientConnected();
-		void setCallbackOnConnect(void (*callback)());
-		void setCallbackOnDisconnect(void (*callback)());
-		// Functions offered by HardwareSerial class:
+class TelnetSpy : public Stream
+{
+public:
+	TelnetSpy();
+	~TelnetSpy();
+	void handle(void);
+	void setPort(uint16_t portToUse);
+	void setWelcomeMsg(char *msg);
+	void setRejectMsg(char *msg);
+	void setMinBlockSize(uint16_t minSize);
+	void setCollectingTime(uint16_t colTime);
+	void setMaxBlockSize(uint16_t maxSize);
+	bool setBufferSize(uint16_t newSize);
+	uint16_t getBufferSize();
+	void setStoreOffline(bool store);
+	bool getStoreOffline();
+	void setPingTime(uint16_t pngTime);
+	void setSerial(HardwareSerial *usedSerial);
+	bool isClientConnected();
+	void setCallbackOnConnect(void (*callback)());
+	void setCallbackOnDisconnect(void (*callback)());
+	// Functions offered by HardwareSerial class:
 #ifdef ESP8266
-		void begin(unsigned long baud) { begin(baud, SERIAL_8N1, SERIAL_FULL, 1); }
-		void begin(unsigned long baud, SerialConfig config) { begin(baud, config, SERIAL_FULL, 1); }
-		void begin(unsigned long baud, SerialConfig config, SerialMode mode) { begin(baud, config, mode, 1); }
-		void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin);
-#else	// ESP32
-		void begin(unsigned long baud, uint32_t config=SERIAL_8N1, int8_t rxPin=-1, int8_t txPin=-1, bool invert=false);
+	void begin(unsigned long baud)
+	{
+		begin(baud, SERIAL_8N1, SERIAL_FULL, 1);
+	}
+	void begin(unsigned long baud, SerialConfig config) { begin(baud, config, SERIAL_FULL, 1); }
+	void begin(unsigned long baud, SerialConfig config, SerialMode mode) { begin(baud, config, mode, 1); }
+	void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin);
+#else // ESP32
+	void begin(unsigned long baud, uint32_t config = SERIAL_8N1, int8_t rxPin = -1, int8_t txPin = -1, bool invert = false);
 #endif
-		void end();
+	void end();
 #ifdef ESP8266
-		void swap() { swap(1); }
-		void swap(uint8_t tx_pin);
-		void set_tx(uint8_t tx_pin);
-		void pins(uint8_t tx, uint8_t rx);
-		bool isTxEnabled(void);
-		bool isRxEnabled(void);
+	void swap()
+	{
+		swap(1);
+	}
+	void swap(uint8_t tx_pin);
+	void set_tx(uint8_t tx_pin);
+	void pins(uint8_t tx, uint8_t rx);
+	bool isTxEnabled(void);
+	bool isRxEnabled(void);
 #endif
-		int available(void) override;
-		int peek(void) override;
-		int read(void) override;
-		int availableForWrite(void);
-		void flush(void) override;
-		size_t write(uint8_t) override;
-		inline size_t write(unsigned long n) { return write((uint8_t) n); }
-		inline size_t write(long n) { return write((uint8_t) n); }
-		inline size_t write(unsigned int n) { return write((uint8_t) n); }
-		inline size_t write(int n) { return write((uint8_t) n); }
-		using Print::write;
-		operator bool() const;
-		void setDebugOutput(bool);
-		uint32_t baudRate(void);
+	int available(void) override;
+	int peek(void) override;
+	int read(void) override;
+	int availableForWrite(void);
+	void flush(void) override;
+	size_t write(uint8_t) override;
+	inline size_t write(unsigned long n) { return write((uint8_t)n); }
+	inline size_t write(long n) { return write((uint8_t)n); }
+	inline size_t write(unsigned int n) { return write((uint8_t)n); }
+	inline size_t write(int n) { return write((uint8_t)n); }
+	using Print::write;
+	operator bool() const;
+	void setDebugOutput(bool);
+	uint32_t baudRate(void);
 
-	protected:
-		CRITCAL_SECTION_MUTEX
-		void sendBlock(void);
-		void addTelnetBuf(char c);
-		char pullTelnetBuf();
-		char peekTelnetBuf();
-		int telnetAvailable();
-		WiFiServer* telnetServer;
-		WiFiClient client;
-		uint16_t port;
-		HardwareSerial* usedSer;
-		bool storeOffline;
-		bool started;
-		bool listening;
-		bool firstMainLoop;
-		unsigned long waitRef;
-		unsigned long pingRef;
-		uint16_t pingTime;
-		char* welcomeMsg;
-		char* rejectMsg;
-		uint16_t minBlockSize;
-		uint16_t collectingTime;
-		uint16_t maxBlockSize;
-		bool debugOutput;
-		char* telnetBuf;
-		uint16_t bufLen;
-		uint16_t bufUsed;
-		uint16_t bufRdIdx;
-		uint16_t bufWrIdx;
-		bool connected;
-		void (*callbackConnect)();
-		void (*callbackDisconnect)();
+protected:
+	CRITCAL_SECTION_MUTEX
+	void sendBlock(void);
+	void addTelnetBuf(char c);
+	char pullTelnetBuf();
+	char peekTelnetBuf();
+	int telnetAvailable();
+	WiFiServer *telnetServer;
+	WiFiClient client;
+	uint16_t port;
+	HardwareSerial *usedSer;
+	bool storeOffline;
+	bool started;
+	bool listening;
+	bool firstMainLoop;
+	unsigned long waitRef;
+	unsigned long pingRef;
+	uint16_t pingTime;
+	char *welcomeMsg;
+	char *rejectMsg;
+	uint16_t minBlockSize;
+	uint16_t collectingTime;
+	uint16_t maxBlockSize;
+	bool debugOutput;
+	char *telnetBuf;
+	uint16_t bufLen;
+	uint16_t bufUsed;
+	uint16_t bufRdIdx;
+	uint16_t bufWrIdx;
+	bool connected;
+	void (*callbackConnect)();
+	void (*callbackDisconnect)();
 };
 
 #endif
-
